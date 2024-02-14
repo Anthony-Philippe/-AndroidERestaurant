@@ -3,4 +3,6 @@
     <string name="entrées_btn">Entrées</string>
     <string name="plats_btn">Plats</string>
     <string name="desserts_btn">Desserts</string>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>
