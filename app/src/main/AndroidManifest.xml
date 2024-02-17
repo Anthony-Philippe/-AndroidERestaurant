@@ -16,6 +16,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="34">
         <activity
+            android:name=".basket.BasketActivity"
+            android:exported="false" />
+        <activity
             android:name=".DetailActivity"
             android:exported="false" />
         <activity
