@@ -2,6 +2,7 @@ package fr.isen.philippe.androiderestaurant
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -107,6 +108,7 @@ class DetailActivity : ComponentActivity() {
                     if (dish != null) {
                         Basket.current(context).add(dish, count.value, context)
                     }
+                    Toast.makeText(context, "Ajouté au panier", Toast.LENGTH_SHORT).show()
                 }) {
                     Text("Commander")
                 }

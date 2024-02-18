@@ -5,10 +5,12 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -106,15 +108,13 @@ fun BasketView() {
 
 @Composable
 fun BasketItemView(item: BasketItem, basketItems: MutableList<BasketItem>) {
-    Card {
+    Card(modifier = Modifier.padding(8.dp)) {
         val context = LocalContext.current
         Card(
-            border = BorderStroke(1.dp, Color.Black),
             modifier = Modifier
-                .padding(8.dp)
                 .fillMaxWidth()
         ) {
-            Row(Modifier.padding(8.dp)) {
+            Row(Modifier.padding(10.dp)) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(item.dish.images.first())
@@ -124,25 +124,28 @@ fun BasketItemView(item: BasketItem, basketItems: MutableList<BasketItem>) {
                     error = painterResource(R.drawable.ic_launcher_foreground),
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .width(80.dp)
-                        .height(80.dp)
-                        .clip(RoundedCornerShape(10))
-                        .padding(8.dp)
+                        .width(100.dp)
+                        .height(100.dp)
                 )
+                Spacer(modifier = Modifier.width(10.dp))
                 Column(
                     Modifier
                         .align(alignment = Alignment.CenterVertically)
-                        .padding(8.dp)
+                        .weight(1f)
                 ) {
-                    Text(item.dish.name)
+                    Text(item.dish.name, fontWeight = FontWeight.Bold)
                     Text("${item.dish.prices.first().price} €")
                     Text("Quantité: ${item.count}")
                 }
-                Button(onClick = {
-                    Basket.current(context).delete(item, context)
-                    basketItems.clear()
-                    basketItems.addAll(Basket.current(context).items)
-                }) {
+                Button(
+                    modifier = Modifier
+                        .align(Alignment.Bottom),
+                    onClick = {
+                        Basket.current(context).delete(item, context)
+                        basketItems.clear()
+                        basketItems.addAll(Basket.current(context).items)
+                    }
+                ) {
                     Text("X")
                 }
             }
