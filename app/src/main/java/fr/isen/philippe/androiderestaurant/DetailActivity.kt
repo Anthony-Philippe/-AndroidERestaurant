@@ -13,9 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
@@ -26,7 +24,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -39,8 +36,10 @@ import coil.request.ImageRequest
 import fr.isen.philippe.androiderestaurant.basket.Basket
 import fr.isen.philippe.androiderestaurant.basket.BasketActivity
 import fr.isen.philippe.androiderestaurant.network.Dish
+import fr.isen.philippe.androiderestaurant.ui.theme.AndroidERestaurantTheme
 import kotlin.math.max
 
+@Suppress("DEPRECATION")
 class DetailActivity : ComponentActivity() {
     @OptIn(
         ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
@@ -59,64 +58,69 @@ class DetailActivity : ComponentActivity() {
             val pagerState = rememberPagerState(pageCount = {
                 dish?.images?.count() ?: 0
             })
-            TopAppBar({
-                Text(dish?.name ?: "")
-            })
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                HorizontalPager(state = pagerState) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(dish?.images?.get(it))
-                            .build(),
-                        null,
-                        placeholder = painterResource(R.drawable.ic_launcher_foreground),
-                        error = painterResource(R.drawable.ic_launcher_foreground),
-                        contentScale = ContentScale.FillBounds,
-                        modifier = Modifier.fillMaxWidth().aspectRatio(1f).padding(15.dp)
-                    )
-                }
-                Text(
-                    text = "Ingrédients: \n $ingredient",
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(8.dp)
-                )
-                Text(price.toString() + "€")
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+            AndroidERestaurantTheme {
+                TopAppBar({
+                    Text(dish?.name ?: "")
+                })
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Spacer(Modifier.weight(1f))
-                    OutlinedButton(onClick = {
-                        count.value = max(1, count.value - 1)
+                    HorizontalPager(state = pagerState) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(dish?.images?.get(it))
+                                .build(),
+                            null,
+                            placeholder = painterResource(R.drawable.ic_launcher_foreground),
+                            error = painterResource(R.drawable.ic_launcher_foreground),
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
+                                .padding(15.dp)
+                        )
+                    }
+                    Text(
+                        text = "Ingrédients: \n $ingredient",
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                    Text(price.toString() + "€")
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Spacer(Modifier.weight(1f))
+                        OutlinedButton(onClick = {
+                            count.value = max(1, count.value - 1)
+                        }) {
+                            Text("-")
+                        }
+                        Text(count.value.toString())
+                        OutlinedButton(onClick = {
+                            count.value = count.value + 1
+                        }) {
+                            Text("+")
+                        }
+                        Spacer(Modifier.weight(1f))
+                    }
+                    Button(onClick = {
+                        if (dish != null) {
+                            Basket.current(context).add(dish, count.value, context)
+                        }
+                        Toast.makeText(context, "Ajouté au panier", Toast.LENGTH_SHORT).show()
                     }) {
-                        Text("-")
+                        Text("Ajouter au panier",)
                     }
-                    Text(count.value.toString())
-                    OutlinedButton(onClick = {
-                        count.value = count.value + 1
+                    Button(onClick = {
+                        val intent = Intent(context, BasketActivity::class.java)
+                        context.startActivity(intent)
                     }) {
-                        Text("+")
+                        Text("Voir mon panier")
                     }
-                    Spacer(Modifier.weight(1f))
-                }
-                Button(onClick = {
-                    if (dish != null) {
-                        Basket.current(context).add(dish, count.value, context)
-                    }
-                    Toast.makeText(context, "Ajouté au panier", Toast.LENGTH_SHORT).show()
-                }) {
-                    Text("Commander")
-                }
-                Button(onClick = {
-                    val intent = Intent(context, BasketActivity::class.java)
-                    context.startActivity(intent)
-                }) {
-                    Text("Voir mon panier")
                 }
             }
         }

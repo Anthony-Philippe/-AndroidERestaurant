@@ -27,8 +27,6 @@ class Basket {
         save(context)
     }
 
-
-
     fun save(context: Context) {
         val json = GsonBuilder().create().toJson(this)
 

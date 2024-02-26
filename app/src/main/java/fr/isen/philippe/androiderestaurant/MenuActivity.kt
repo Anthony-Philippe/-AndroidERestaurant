@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +46,8 @@ import fr.isen.philippe.androiderestaurant.network.Dish
 import fr.isen.philippe.androiderestaurant.network.MenuResult
 import fr.isen.philippe.androiderestaurant.network.NetworkConstants
 import com.google.gson.GsonBuilder
+import fr.isen.philippe.androiderestaurant.basket.BasketActivity
+import fr.isen.philippe.androiderestaurant.ui.theme.AndroidERestaurantTheme
 import org.json.JSONObject
 
 class MenuActivity : ComponentActivity() {
@@ -55,7 +58,9 @@ class MenuActivity : ComponentActivity() {
             (intent.getSerializableExtra(CATEGORY_EXTRA_KEY) as? ItemType) ?: ItemType.STARTER
 
         setContent {
-            MenuView(type)
+            AndroidERestaurantTheme {
+                MenuView(type)
+            }
         }
         Log.d("lifeCycle", "Menu Activity - OnCreate")
     }
@@ -83,25 +88,28 @@ class MenuActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuView(type: ItemType) {
-    val category = remember {
-        mutableStateOf<Category?>(null)
-    }
-    Column(
-        Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        TopAppBar({
-            Text(type.title())
-        })
-        Divider()
-        LazyVerticalGrid(
-            GridCells.Fixed(2),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            category.value?.let { it ->
-                items(it.items) { dish ->
-                    DishCard(dish)
-                }
+    val context = LocalContext.current
+    val category = remember { mutableStateOf<Category?>(null) }
+
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        TopAppBar(modifier = Modifier.fillMaxWidth(), title = { Text(text = type.title()) },
+            actions = {
+                Button(
+                    onClick = {
+                        context.startActivity(
+                            Intent(
+                                context,
+                                BasketActivity::class.java
+                            )
+                        )
+                    },
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                ) { Text("Voir mon panier") }
             }
+        )
+        Divider()
+        LazyVerticalGrid(GridCells.Fixed(2), modifier = Modifier.fillMaxWidth()) {
+            category.value?.let { items(it.items) { dish -> DishCard(dish) } }
         }
     }
     PostData(type, category)
@@ -114,15 +122,14 @@ fun DishCard(dish: Dish) {
         .padding(8.dp)
         .height(225.dp)
         .clickable {
-            val intent = Intent(context, DetailActivity::class.java).apply {
-                putExtra(DetailActivity.DISH_EXTRA_KEY, dish)
-            }
-            context.startActivity(intent)
+            context.startActivity(
+                Intent(context, DetailActivity::class.java).apply {
+                    putExtra(DetailActivity.DISH_EXTRA_KEY, dish)
+                }
+            )
         }
     ) {
-        Box(
-            modifier = Modifier.clip(RoundedCornerShape(8.dp))
-        ) {
+        Box(modifier = Modifier.clip(RoundedCornerShape(8.dp))) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -130,30 +137,22 @@ fun DishCard(dish: Dish) {
                     .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
             ) {
                 AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current).data(dish.images.first())
-                        .build(),
+                    model = ImageRequest.Builder(context).data(dish.images.first()).build(),
                     null,
                     placeholder = painterResource(R.drawable.ic_launcher_foreground),
                     error = painterResource(R.drawable.ic_launcher_foreground),
                     contentScale = ContentScale.Crop
                 )
             }
-            Column(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .align(Alignment.BottomStart)
-            ) {
+            Column(modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.BottomStart)) {
                 Text(
-                    dish.name,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 125.dp),
+                    dish.name, fontSize = 15.sp, fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 120.dp),
                     color = Color.Black.copy(alpha = ContentAlpha.high)
                 )
-                Text(
-                    "${dish.prices.first().price} €",
-                    fontSize = 18.sp
-                )
+                Text("${dish.prices.first().price} €", fontSize = 18.sp)
             }
         }
     }
