@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,6 +48,7 @@ import fr.isen.philippe.androiderestaurant.network.MenuResult
 import fr.isen.philippe.androiderestaurant.network.NetworkConstants
 import com.google.gson.GsonBuilder
 import fr.isen.philippe.androiderestaurant.basket.BasketActivity
+import fr.isen.philippe.androiderestaurant.basket.BasketItem
 import fr.isen.philippe.androiderestaurant.ui.theme.AndroidERestaurantTheme
 import org.json.JSONObject
 
@@ -104,7 +106,9 @@ fun MenuView(type: ItemType) {
                         )
                     },
                     modifier = Modifier.align(Alignment.CenterVertically)
-                ) { Text("Voir mon panier") }
+                ) {
+                    Text("Voir mon panier")
+                }
             }
         )
         Divider()
@@ -144,9 +148,11 @@ fun DishCard(dish: Dish) {
                     contentScale = ContentScale.Crop
                 )
             }
-            Column(modifier = Modifier
-                .padding(8.dp)
-                .align(Alignment.BottomStart)) {
+            Column(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .align(Alignment.BottomStart)
+            ) {
                 Text(
                     dish.name, fontSize = 15.sp, fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 120.dp),

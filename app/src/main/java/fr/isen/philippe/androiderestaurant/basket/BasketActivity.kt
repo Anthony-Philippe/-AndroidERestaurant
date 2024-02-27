@@ -1,5 +1,6 @@
 package fr.isen.philippe.androiderestaurant.basket
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import fr.isen.philippe.androiderestaurant.HomeActivity
 import fr.isen.philippe.androiderestaurant.R
 import fr.isen.philippe.androiderestaurant.ui.theme.AndroidERestaurantTheme
 import java.math.BigDecimal
@@ -54,7 +56,12 @@ fun BasketView() {
     val context = LocalContext.current
     val basketItems = remember { mutableStateListOf<BasketItem>() }
 
-    TopAppBar(title = { Text(text = stringResource(id = R.string.panier_title), fontWeight = FontWeight.Bold) })
+    TopAppBar(title = {
+        Text(
+            text = stringResource(id = R.string.panier_title),
+            fontWeight = FontWeight.Bold
+        )
+    })
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -70,10 +77,19 @@ fun BasketView() {
                 fontWeight = FontWeight.Bold
             )
             Button(onClick = {
-                if (basketItems.isNotEmpty())
+                if (basketItems.isNotEmpty()) {
                     Toast.makeText(context, "Commande passée", Toast.LENGTH_SHORT).show()
+                    basketItems.clear()
+                    Basket.current(context).deleteAll(context)
+                    basketItems.addAll(Basket.current(context).items)
+                    context.startActivity(Intent(context, HomeActivity::class.java))
+                }
             }) {
-                Text(if (basketItems.isEmpty()) stringResource(id = R.string.empty_basket) else stringResource(id = R.string.order_button))
+                Text(
+                    if (basketItems.isEmpty()) stringResource(id = R.string.empty_basket) else stringResource(
+                        id = R.string.order_button
+                    )
+                )
             }
             if (basketItems.isNotEmpty()) {
                 Button(onClick = {
@@ -110,10 +126,11 @@ fun BasketItemView(item: BasketItem, basketItems: MutableList<BasketItem>) {
                 Column(
                     Modifier
                         .align(alignment = Alignment.CenterVertically)
-                        .weight(1f)) {
+                        .weight(1f)
+                ) {
                     Text(item.dish.name, fontWeight = FontWeight.Bold)
                     Text("${item.dish.prices.first().price} €")
-                    Text(stringResource(id = R.string.quantity_basket, item.count))
+                    Text("Quantité: ${item.count}")
                 }
                 Button(onClick = {
                     Basket.current(context).delete(item, context)
