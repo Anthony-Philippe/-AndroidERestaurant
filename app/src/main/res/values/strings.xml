@@ -3,4 +3,13 @@
     <string name="entrées_btn">Entrées</string>
     <string name="plats_btn">Plats</string>
     <string name="desserts_btn">Desserts</string>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="panier_title">Panier</string>
+    <string name="total_text">Total: %1$d €</string>
+    <string name="empty_basket">Panier vide</string>
+    <string name="order_button">Commander</string>
+    <string name="clear_basket">Vider le panier</string>
+    <string name="quantity_basket">Quantité:</string>
 </resources>
