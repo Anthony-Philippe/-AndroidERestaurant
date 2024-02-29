@@ -47,10 +47,12 @@ import fr.isen.philippe.androiderestaurant.network.Dish
 import fr.isen.philippe.androiderestaurant.network.MenuResult
 import fr.isen.philippe.androiderestaurant.network.NetworkConstants
 import com.google.gson.GsonBuilder
+import fr.isen.philippe.androiderestaurant.basket.Basket
 import fr.isen.philippe.androiderestaurant.basket.BasketActivity
 import fr.isen.philippe.androiderestaurant.basket.BasketItem
 import fr.isen.philippe.androiderestaurant.ui.theme.AndroidERestaurantTheme
 import org.json.JSONObject
+import java.math.BigDecimal
 
 class MenuActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -183,4 +185,13 @@ fun PostData(type: ItemType, category: MutableState<Category?>) {
     })
 
     queue.add(request)
+}
+
+fun calculateTotalPrice(basketItems: List<BasketItem>): BigDecimal {
+    var totalPrice = BigDecimal.ZERO
+    for (item in basketItems) {
+        val itemPrice = BigDecimal(item.dish.prices.first().price)
+        totalPrice += itemPrice * BigDecimal(item.count)
+    }
+    return totalPrice
 }

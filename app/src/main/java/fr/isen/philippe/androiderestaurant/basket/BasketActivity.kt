@@ -16,9 +16,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -32,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import fr.isen.philippe.androiderestaurant.HomeActivity
@@ -78,11 +84,11 @@ fun BasketView() {
             )
             Button(onClick = {
                 if (basketItems.isNotEmpty()) {
-                    Toast.makeText(context, "Commande passée", Toast.LENGTH_SHORT).show()
+                    context.startActivity(Intent(context, HomeActivity::class.java))
                     basketItems.clear()
                     Basket.current(context).deleteAll(context)
                     basketItems.addAll(Basket.current(context).items)
-                    context.startActivity(Intent(context, HomeActivity::class.java))
+                    Toast.makeText(context, "Commande passée", Toast.LENGTH_SHORT).show()
                 }
             }) {
                 Text(
@@ -130,15 +136,45 @@ fun BasketItemView(item: BasketItem, basketItems: MutableList<BasketItem>) {
                 ) {
                     Text(item.dish.name, fontWeight = FontWeight.Bold)
                     Text("${item.dish.prices.first().price} €")
-                    Text("Quantité: ${item.count}")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(
+                            onClick = {
+                                if (item.count > 1) {
+                                    Basket.current(context).add(item.dish, -1, context)
+                                    basketItems.clear()
+                                    basketItems.addAll(Basket.current(context).items)
+                                }
+                            }
+                        ) {
+                            Text(
+                                text = "-",
+                                fontSize = 35.sp,
+                                modifier = Modifier.padding(top = 0.dp)
+                            )
+                        }
+                        Text(item.count.toString(), Modifier.padding(horizontal = 8.dp))
+                        IconButton(
+                            onClick = {
+                                Basket.current(context).add(item.dish, 1, context)
+                                basketItems.clear()
+                                basketItems.addAll(Basket.current(context).items)
+                            }
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = "Add")
+                        }
+                        IconButton(
+                            onClick = {
+                                Basket.current(context).delete(item, context)
+                                basketItems.clear()
+                                basketItems.addAll(Basket.current(context).items)
+                            },
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            Icon(Icons.Default.Delete, contentDescription = "Supprimer")
+                        }
+                    }
                 }
-                Button(onClick = {
-                    Basket.current(context).delete(item, context)
-                    basketItems.clear()
-                    basketItems.addAll(Basket.current(context).items)
-                }, modifier = Modifier.align(Alignment.Bottom)) {
-                    Text("X")
-                }
+
             }
         }
     }
